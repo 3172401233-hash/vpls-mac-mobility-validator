@@ -1,0 +1,33 @@
+{
+  "name": "vm-migration-with-stale-pw",
+  "vsi": "VSI-100",
+  "vlan": 100,
+  "config": {
+    "maxHops": 8,
+    "broadcastPwLimit": 2
+  },
+  "pes": [
+    { "id": "PE1", "acs": ["PE1-AC"] },
+    { "id": "PE2", "acs": ["PE2-AC"] },
+    { "id": "PE3", "acs": ["PE3-AC"] }
+  ],
+  "pws": [
+    { "id": "PW-1-2", "endpoints": ["PE1", "PE2"] },
+    { "id": "PW-2-3", "endpoints": ["PE2", "PE3"] },
+    { "id": "PW-1-3", "endpoints": ["PE1", "PE3"] }
+  ],
+  "events": [
+    { "ts": 1, "type": "learn", "pe": "PE1", "mac": "00:11:22:33:44:55", "source": "PE1-AC", "sourceType": "ac", "seq": 0 },
+    { "ts": 2, "type": "learn", "pe": "PE2", "mac": "00:11:22:33:44:55", "source": "PW-1-2", "sourceType": "pw", "seq": 0 },
+    { "ts": 3, "type": "learn", "pe": "PE3", "mac": "00:11:22:33:44:55", "source": "PW-1-3", "sourceType": "pw", "seq": 0 },
+    { "ts": 4, "type": "learn", "pe": "PE3", "mac": "00:11:22:33:44:55", "source": "PE3-AC", "sourceType": "ac", "seq": 1 },
+    { "ts": 5, "type": "withdraw", "from": "PE3", "mac": "00:11:22:33:44:55", "seq": 1, "target": "PE1" },
+    { "ts": 5, "type": "flush", "pe": "PE1", "mac": "00:11:22:33:44:55", "seq": 1, "messageId": "old-pe-flush" },
+    { "ts": 7, "type": "learn", "pe": "PE1", "mac": "00:11:22:33:44:55", "source": "PW-1-2", "sourceType": "pw" },
+    { "ts": 8, "type": "traffic", "pe": "PE2", "dstMac": "00:11:22:33:44:55", "srcMac": "00:aa:bb:cc:dd:ee", "ingressPort": "PE2-AC" },
+    { "ts": 9, "type": "flush", "pe": "PE2", "mac": "00:11:22:33:44:55", "messageId": "flush-1" },
+    { "ts": 9, "type": "flush", "pe": "PE2", "mac": "00:11:22:33:44:55", "messageId": "flush-1" },
+    { "ts": 10, "type": "withdraw", "from": "PE3", "mac": "00:11:22:33:44:55", "seq": 1, "target": "PE2", "messageId": "dup-w-1" },
+    { "ts": 10, "type": "withdraw", "from": "PE3", "mac": "00:11:22:33:44:55", "seq": 1, "target": "PE2", "messageId": "dup-w-1" }
+  ]
+}
